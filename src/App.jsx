@@ -44,9 +44,10 @@ function App() {
 
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-  const handleClick = (event) => {
-    console.log(event.currentTarget,"ppspapsa")
+
+  const handleClick = (event, user) => {
     setAnchorEl(event.currentTarget);
+    setEditObj(user);
   };
   const handleClose = () => {
     setAnchorEl(null);
@@ -62,13 +63,12 @@ function App() {
   useEffect(() => {
     if (apiStatus.status == "success") {
       setIsDialogOpen(false);
+      setIsDialogOpenEdit(false);
       fetchData();
     }
   }, [apiStatus]);
 
-  const onEditClick = (obj) => {
-    console.log(obj,"LLLL")
-    setEditObj(obj);
+  const onEditClick = () => {
     setIsDialogOpenEdit(true);
     setAnchorEl(null);
   };
@@ -103,7 +103,7 @@ function App() {
             <th className="px-6 py-3 text-left">Action</th>
           </tr>
         </thead>
-        <tbody className="bg-white max-h-[50vh] overflow-y-auto overflow-x-hidden">
+        <tbody className="custom-scrollbar">
           {finalData.map((user) => (
             <tr key={user.id} className="hover:bg-gray-100">
               <td className="px-6 py-4">{user.slno}</td>
@@ -120,7 +120,7 @@ function App() {
                   aria-haspopup="true"
                   aria-expanded={open ? "true" : undefined}
                   onClick={(event) => handleClick(event, user)}
-                  >
+                >
                   <MoreVert />
                 </IconButton>
                 <Menu
@@ -206,8 +206,8 @@ function App() {
                   onClick={() => handlePagination(index)}
                   className={`${
                     page === index
-                      ? "relative z-10 inline-flex items-center bg-indigo-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                      : "relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+                      ? "relative z-10 inline-flex items-center bg-blue-600 backdrop-blur px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                      : "relative inline-flex items-center bg-blue-300 backdrop-blur px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
                   }`}
                 >
                   {index + 1}

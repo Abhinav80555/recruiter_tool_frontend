@@ -101,7 +101,7 @@ export function EditUser({ closeDialog, setApiStatus, editObj }) {
     formData.append("node", newUser.nodeExperience);
     formData.append("status", newUser.status);
     formData.append("score", score);
-    formData.append("id");
+    formData.append("id",editObj.id);
 
     editData(formData);
   };
