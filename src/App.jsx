@@ -4,20 +4,29 @@ import { IconButton, ListItemIcon, Menu, MenuItem } from "@mui/material";
 import { Delete, Edit, MoreVert } from "@mui/icons-material";
 import { AddUser } from "./components/AddUser";
 import { getAllUser } from "./API/getAllUser";
+import { EditUser } from "./components/EditUser";
 
 function App() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDialogOpenEdit, setIsDialogOpenEdit] = useState(false);
+  const [editObj, setEditObj] = useState(null);
 
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState();
   const [page, setPage] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [apiStatus,setApiStatus] =useState({status:"idle",msg:""})
+  const [apiStatus, setApiStatus] = useState({ status: "idle", msg: "" });
   // --------------------------------
   const [finalData, setFinalData] = useState([]);
 
-  const fetchData = getAllUser(page, limit, search, setFinalData, setTotalItems);
+  const fetchData = getAllUser(
+    page,
+    limit,
+    search,
+    setFinalData,
+    setTotalItems
+  );
 
   useEffect(() => {
     fetchData();
@@ -25,24 +34,23 @@ function App() {
 
   const openDialog = () => {
     setIsDialogOpen(true);
+    setAnchorEl(null);
   };
 
   const closeDialog = () => {
     setIsDialogOpen(false);
+    setIsDialogOpenEdit(false);
   };
 
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
+    console.log(event.currentTarget,"ppspapsa")
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
     setAnchorEl(null);
   };
-
-  const indexOfLastUser = (page + 1) * limit;
-  const indexOfFirstUser = indexOfLastUser - limit;
-  const currentUsers = finalData.slice(indexOfFirstUser, indexOfLastUser);
 
   const handleSearch = (event) => {};
 
@@ -51,12 +59,19 @@ function App() {
     setPage(pageNumber);
   };
 
-
-  useEffect(()=>{
-    if(apiStatus.status){
-    setIsDialogOpen(false)
+  useEffect(() => {
+    if (apiStatus.status == "success") {
+      setIsDialogOpen(false);
+      fetchData();
     }
-  },[apiStatus])
+  }, [apiStatus]);
+
+  const onEditClick = (obj) => {
+    console.log(obj,"LLLL")
+    setEditObj(obj);
+    setIsDialogOpenEdit(true);
+    setAnchorEl(null);
+  };
   return (
     <div className="container mx-auto">
       <h1 className="text-2xl font-semibold mb-4 text-left">User Management</h1>
@@ -74,8 +89,6 @@ function App() {
           Add User
         </button>
       </div>
-
-      {isDialogOpen && <AddUser closeDialog={closeDialog} setApiStatus={setApiStatus}/>}
 
       <table className="w-full shadow-md rounded-lg overflow-hidden">
         <thead className="bg-gray-800 text-white">
@@ -106,8 +119,8 @@ function App() {
                   aria-controls={open ? "basic-menu" : undefined}
                   aria-haspopup="true"
                   aria-expanded={open ? "true" : undefined}
-                  onClick={handleClick}
-                >
+                  onClick={(event) => handleClick(event, user)}
+                  >
                   <MoreVert />
                 </IconButton>
                 <Menu
@@ -144,7 +157,15 @@ function App() {
                   transformOrigin={{ horizontal: "right", vertical: "top" }}
                   anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
                 >
-                  <MenuItem onClick={handleClose}>
+                  <MenuItem
+                    onClick={() => onEditClick(user)}
+                    // onClick={(e)=>{
+                    //   e.preventDefault()
+                    //   setIsDialogOpenEdit(true)
+                    //   setEditObj(user)
+                    //   setAnchorEl(null)
+                    // }}
+                  >
                     <ListItemIcon>
                       <Edit fontSize="small" />
                     </ListItemIcon>
@@ -196,9 +217,18 @@ function App() {
           </nav>
         </div>
       </div>
+      {isDialogOpen && (
+        <AddUser closeDialog={closeDialog} setApiStatus={setApiStatus} />
+      )}
+      {isDialogOpenEdit && (
+        <EditUser
+          closeDialog={closeDialog}
+          setApiStatus={setApiStatus}
+          editObj={editObj}
+        />
+      )}
     </div>
   );
 }
 
 export default App;
-

@@ -1,19 +1,35 @@
 import { useEffect, useState } from "react";
 import { baseURL } from "../API/helpher";
 
-export function AddUser({ closeDialog, setApiStatus }) {
-  const calculatedScore = 0;
+export function EditUser({ closeDialog, setApiStatus, editObj }) {
+  const [calculatedScore, setCalculatedScore] = useState(0);
   const [score, setScore] = useState(0);
   const [newUser, setNewUser] = useState({
     name: "",
     email: "",
     phone: "",
     status: "Contacted",
-    skills:"",
     expectedSalary: "",
     reactExperience: "",
     nodeExperience: "",
+    skills: "",
   });
+
+  useEffect(() => {
+
+    if (editObj != null) {
+      setNewUser({
+        name: editObj.name,
+        email: editObj.email,
+        phone: editObj.phone,
+        status: editObj.status,
+        expectedSalary: editObj.expected,
+        reactExperience: editObj.react,
+        nodeExperience: editObj.node,
+        skills: editObj.skill,
+      });
+    }
+  }, [editObj]);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -23,9 +39,9 @@ export function AddUser({ closeDialog, setApiStatus }) {
     }));
   };
 
-  const addData = async (payload) => {
+  const editData = async (payload) => {
     try {
-      const response = await fetch(`${baseURL}user/add`, {
+      const response = await fetch(`${baseURL}user/edit`, {
         method: "POST",
         body: payload,
       });
@@ -33,8 +49,8 @@ export function AddUser({ closeDialog, setApiStatus }) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
       const data = await response.json();
-      if(data){
-      setApiStatus({ status: "success", msg: data.msg });
+      if (data) {
+        setApiStatus({ status: "success", msg: data.msg });
       }
     } catch (error) {
       console.error("Error adding data:", error);
@@ -52,17 +68,16 @@ export function AddUser({ closeDialog, setApiStatus }) {
     }, 100);
 
     return () => clearInterval(interval);
-  }, [score, calculatedScore]);
+  }, [score, calculatedScore, editObj]);
 
   useEffect(() => {
     const reactScore = calculateScore(newUser.reactExperience);
     const nodeScore = calculateScore(newUser.nodeExperience);
     const totalScore = reactScore + nodeScore;
     setScore(totalScore);
-  }, [newUser]);
+  }, [newUser.reactExperience, newUser.nodeExperience]);
 
   const calculateScore = (experience) => {
-    console.log("Experience:", experience);
     if (experience === "") {
       return 0;
     } else if (experience < 1) {
@@ -86,8 +101,9 @@ export function AddUser({ closeDialog, setApiStatus }) {
     formData.append("node", newUser.nodeExperience);
     formData.append("status", newUser.status);
     formData.append("score", score);
+    formData.append("id");
 
-    addData(formData);
+    editData(formData);
   };
 
   return (
