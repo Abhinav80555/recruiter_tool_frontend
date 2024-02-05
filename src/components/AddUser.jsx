@@ -1,15 +1,18 @@
 import { useEffect, useState } from "react";
 import { baseURL } from "../API/helpher";
+import { CircularProgress } from "@mui/material";
 
 export function AddUser({ closeDialog, setApiStatus }) {
   const calculatedScore = 0;
   const [score, setScore] = useState(0);
+  const [loading, setLoading] = useState(false);
+
   const [newUser, setNewUser] = useState({
     name: "",
     email: "",
     phone: "",
     status: "Contacted",
-    skills:"",
+    skills: "",
     expectedSalary: "",
     reactExperience: "",
     nodeExperience: "",
@@ -25,6 +28,7 @@ export function AddUser({ closeDialog, setApiStatus }) {
 
   const addData = async (payload) => {
     try {
+      setLoading(true);
       const response = await fetch(`${baseURL}user/add`, {
         method: "POST",
         body: payload,
@@ -33,11 +37,13 @@ export function AddUser({ closeDialog, setApiStatus }) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
       const data = await response.json();
-      if(data){
-      setApiStatus({ status: "success", msg: data.msg });
+      if (data) {
+        setApiStatus({ status: "success", msg: data.msg });
+        setLoading(false);
       }
     } catch (error) {
       console.error("Error adding data:", error);
+      setLoading(false);
       setApiStatus({ status: "error", msg: "Error adding data" });
     }
   };
@@ -316,7 +322,14 @@ export function AddUser({ closeDialog, setApiStatus }) {
                   type="submit"
                   className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto min-w-[5rem]"
                 >
-                  Save{" "}
+                  {loading ? (
+                    <CircularProgress
+                      sx={{ color: "#fff" }}
+                      size={"0.875rem"}
+                    />
+                  ) : (
+                    "Save"
+                  )}{" "}
                 </button>
                 <button
                   type="button"

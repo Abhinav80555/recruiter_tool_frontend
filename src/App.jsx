@@ -1,15 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import "./App.css";
 import { IconButton, ListItemIcon, Menu, MenuItem } from "@mui/material";
 import { Delete, Edit, MoreVert } from "@mui/icons-material";
 import { AddUser } from "./components/AddUser";
 import { getAllUser } from "./API/getAllUser";
 import { EditUser } from "./components/EditUser";
+import { DeleteUser } from "./components/DeleteUser";
 
 function App() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDialogOpenEdit, setIsDialogOpenEdit] = useState(false);
   const [editObj, setEditObj] = useState(null);
+  const [openDelete, setOpenDelete] = useState(false);
+
+  const cancelButtonRef = useRef(null);
 
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState();
@@ -70,6 +74,10 @@ function App() {
 
   const onEditClick = () => {
     setIsDialogOpenEdit(true);
+    setAnchorEl(null);
+  };
+  const onDeleteClick = () => {
+    setOpenDelete(true);
     setAnchorEl(null);
   };
   return (
@@ -157,21 +165,13 @@ function App() {
                   transformOrigin={{ horizontal: "right", vertical: "top" }}
                   anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
                 >
-                  <MenuItem
-                    onClick={() => onEditClick(user)}
-                    // onClick={(e)=>{
-                    //   e.preventDefault()
-                    //   setIsDialogOpenEdit(true)
-                    //   setEditObj(user)
-                    //   setAnchorEl(null)
-                    // }}
-                  >
+                  <MenuItem onClick={() => onEditClick(user)}>
                     <ListItemIcon>
                       <Edit fontSize="small" />
                     </ListItemIcon>
                     Edit
                   </MenuItem>
-                  <MenuItem onClick={handleClose}>
+                  <MenuItem onClick={() => onDeleteClick(user)}>
                     <ListItemIcon>
                       <Delete fontSize="small" />
                     </ListItemIcon>
@@ -227,8 +227,11 @@ function App() {
           editObj={editObj}
         />
       )}
+
+      {DeleteUser(openDelete, cancelButtonRef, setOpenDelete,editObj,setApiStatus)}
     </div>
   );
 }
 
 export default App;
+
