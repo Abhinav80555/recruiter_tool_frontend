@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
+import { baseURL } from "../API/helpher";
 
-export function AddUser({ closeDialog }) {
+export function AddUser({ closeDialog, setApiStatus }) {
   const calculatedScore = 0;
   const [score, setScore] = useState(0);
   const [newUser, setNewUser] = useState({
@@ -19,6 +20,24 @@ export function AddUser({ closeDialog }) {
       ...prevUser,
       [name]: value,
     }));
+  };
+
+  const addData = async (payload) => {
+    try {
+      const response = await fetch(`${baseURL}user/add`, {
+        method: "POST",
+        body: payload, // Sending formData as the payload
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log(data.msg,"dad")
+      setApiStatus({ status: "success", msg: data.msg }); // Update apiStatus on success
+    } catch (error) {
+      console.error("Error adding data:", error);
+      setApiStatus({ status: "error", msg: "Error adding data" }); // Update apiStatus on error
+    }
   };
 
   useEffect(() => {
@@ -41,7 +60,7 @@ export function AddUser({ closeDialog }) {
   }, [newUser]);
 
   const calculateScore = (experience) => {
-    console.log("Experience:", experience); // Log the experience value
+    console.log("Experience:", experience);
     if (experience === "") {
       return 0;
     } else if (experience < 1) {
@@ -55,8 +74,18 @@ export function AddUser({ closeDialog }) {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // Perform form submission/validation here
-    console.log(newUser);
+    var formData = new FormData();
+    formData.append("name", newUser.name);
+    formData.append("email", newUser.email);
+    formData.append("phone", newUser.phone);
+    formData.append("expected", newUser.expectedSalary);
+    formData.append("skill", newUser.skills);
+    formData.append("react", newUser.reactExperience);
+    formData.append("node", newUser.nodeExperience);
+    formData.append("status", newUser.status);
+    formData.append("score", score);
+
+    addData(formData);
   };
 
   return (
@@ -101,11 +130,10 @@ export function AddUser({ closeDialog }) {
                     </label>
                     <div className="mt-1">
                       <input
-                        type="tel"
+                        type="text"
                         name="phone"
                         id="phone"
                         autoComplete="off"
-                        pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
                         value={newUser.phone}
                         onKeyPress={(event) => {
                           if (!/[0-9]/.test(event.key)) {

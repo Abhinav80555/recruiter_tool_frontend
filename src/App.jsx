@@ -13,6 +13,7 @@ function App() {
   const [page, setPage] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [apiStatus,setApiStatus] =useState({status:"idle",msg:""})
   // --------------------------------
   const [finalData, setFinalData] = useState([]);
 
@@ -23,12 +24,10 @@ function App() {
   }, [limit, page, search]);
 
   const openDialog = () => {
-    console.log("kasas");
     setIsDialogOpen(true);
   };
 
   const closeDialog = () => {
-    console.log("lkslaklsl");
     setIsDialogOpen(false);
   };
 
@@ -52,6 +51,12 @@ function App() {
     setPage(pageNumber);
   };
 
+
+  useEffect(()=>{
+    if(apiStatus.status){
+    setIsDialogOpen(false)
+    }
+  },[apiStatus])
   return (
     <div className="container mx-auto">
       <h1 className="text-2xl font-semibold mb-4 text-left">User Management</h1>
@@ -70,7 +75,7 @@ function App() {
         </button>
       </div>
 
-      {isDialogOpen && <AddUser closeDialog={closeDialog} />}
+      {isDialogOpen && <AddUser closeDialog={closeDialog} setApiStatus={setApiStatus}/>}
 
       <table className="w-full shadow-md rounded-lg overflow-hidden">
         <thead className="bg-gray-800 text-white">
