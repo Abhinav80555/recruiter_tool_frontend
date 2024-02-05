@@ -76,12 +76,12 @@ function App() {
     <div className="container mx-auto">
       <h1 className="text-2xl font-semibold mb-4 text-left">User Management</h1>
       <div className="flex justify-end item-center mb-4">
-        <input
+        {/* <input
           type="text"
           placeholder="Search by name"
           onChange={handleSearch}
           className="px-2 py-0 mr-2 border border-gray-300 rounded"
-        />
+        /> */}
         <button
           className="bg-blue-500 text-white px-4 py-2 rounded"
           onClick={openDialog}
